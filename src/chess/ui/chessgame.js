@@ -19,8 +19,6 @@ class ChessGame extends React.Component {
     playerTurnToMoveIsWhite: true,
     whiteKingInCheck: false,
     blackKingInCheck: false,
-    selectedPiece: null,
-    legalMoves: [],
   };
 
   componentDidMount() {
@@ -90,6 +88,7 @@ class ChessGame extends React.Component {
       return;
     }
 
+    // let the server and the other client know your move
     if (isMyMove) {
       socket.emit("new move", {
         nextPlayerColorToMove: !this.state.gameState.thisPlayersColorIsWhite,
@@ -110,8 +109,6 @@ class ChessGame extends React.Component {
       playerTurnToMoveIsWhite: !this.props.color,
       whiteKingInCheck: whiteKingInCheck,
       blackKingInCheck: blackKingInCheck,
-      selectedPiece: null,
-      legalMoves: [],
     });
 
     if (blackCheckmated) {
@@ -190,24 +187,6 @@ class ChessGame extends React.Component {
     return hashmap[shortestDistance];
   };
 
-  onMouseoverSquare = (square) => {
-    const piece = this.state.gameState.getPieceBySquare(square);
-    if (!piece) return;
-
-    const legalMoves = this.state.gameState.getLegalMovesForPiece(piece);
-    this.setState({
-      selectedPiece: piece,
-      legalMoves: legalMoves,
-    });
-  };
-
-  onMouseoutSquare = () => {
-    this.setState({
-      selectedPiece: null,
-      legalMoves: [],
-    });
-  };
-
   render() {
     // console.log(this.state.gameState.getBoard())
     //  console.log("it's white's move this time: " + this.state.playerTurnToMoveIsWhite)
@@ -225,41 +204,35 @@ class ChessGame extends React.Component {
             height: "720px",
           }}
         >
-          <Stage
-            width={720}
-            height={720}
-            ref={(node) => (this.boardRef = node)}
-          >
+          <Stage width={720} height={720}>
             <Layer>
               {this.state.gameState.getBoard().map((row) => {
                 return (
                   <React.Fragment>
                     {row.map((square) => {
-                      const piece = square.getPiece();
-                      const legalMoves = this.state.legalMoves.includes(
-                        square.getSquare()
-                      );
-
-                      return (
-                        <Piece
-                          key={square.getSquare()}
-                          x={square.getCanvasCoord()[0]}
-                          y={square.getCanvasCoord()[1]}
-                          imgurls={piecemap[piece?.name]}
-                          isWhite={piece?.color === "white"}
-                          draggedPieceTargetId={this.state.draggedPieceTargetId}
-                          onDragStart={this.startDragging}
-                          onDragEnd={this.endDragging}
-                          id={square.getPieceIdOnThisSquare()}
-                          thisPlayersColorIsWhite={this.props.color}
-                          playerTurnToMoveIsWhite={
-                            this.state.playerTurnToMoveIsWhite
-                          }
-                          whiteKingInCheck={this.state.whiteKingInCheck}
-                          blackKingInCheck={this.state.blackKingInCheck}
-                          legalMove={legalMoves}
-                        />
-                      );
+                      if (square.isOccupied()) {
+                        return (
+                          <Piece
+                            x={square.getCanvasCoord()[0]}
+                            y={square.getCanvasCoord()[1]}
+                            imgurls={piecemap[square.getPiece().name]}
+                            isWhite={square.getPiece().color === "white"}
+                            draggedPieceTargetId={
+                              this.state.draggedPieceTargetId
+                            }
+                            onDragStart={this.startDragging}
+                            onDragEnd={this.endDragging}
+                            id={square.getPieceIdOnThisSquare()}
+                            thisPlayersColorIsWhite={this.props.color}
+                            playerTurnToMoveIsWhite={
+                              this.state.playerTurnToMoveIsWhite
+                            }
+                            whiteKingInCheck={this.state.whiteKingInCheck}
+                            blackKingInCheck={this.state.blackKingInCheck}
+                          />
+                        );
+                      }
+                      return;
                     })}
                   </React.Fragment>
                 );
