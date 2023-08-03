@@ -67,7 +67,7 @@ function VideoChatApp(props) {
       config: {
         iceServers: [
           {
-            urls: "stun:stun.l.google.com:19302",
+            urls: "stun.l.google.com:19302", // Replace with a valid STUN server URL
           },
         ],
       },
