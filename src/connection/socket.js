@@ -1,6 +1,6 @@
 import io from "socket.io-client";
 
-const URL = "http://154.26.128.6:9060";
+const URL = "https://chess-server.mhuq.repl.co";
 
 const socket = io(URL);
 
