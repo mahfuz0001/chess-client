@@ -256,7 +256,7 @@ const ChessGameWrapper = (props) => {
    */
 
   // get the gameId from the URL here and pass it to the chessGame component as a prop.
-  const domainName = "http://154.26.128.6:3000";
+  const domainName = "https://chess-bice.vercel.app";
   const color = React.useContext(ColorContext);
   const { gameid } = useParams();
   const [play] = useSound(chessMove);
